@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SalesTherapist — Hackathon Demo</title>
+<style>
+  :root {
+    --bg: #050508;
+    --surface: #0d0d12;
+    --surface2: #14141c;
+    --border: #1e1e2a;
+    --text: #e2e2ea;
+    --muted: #6e6e82;
+    --accent: #ff6b6b;
+    --green: #2ecc71;
+    --red: #e74c3c;
+    --orange: #f39c12;
+    --blue: #3498db;
+    --purple: #9b59b6;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 4rem 2rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(ellipse at 30% 50%, rgba(255,107,107,0.06) 0%, transparent 60%),
+                radial-gradient(ellipse at 70% 50%, rgba(155,89,182,0.05) 0%, transparent 60%);
+    animation: drift 20s ease-in-out infinite alternate;
+  }
+  @keyframes drift { to { transform: translate(5%, 3%); } }
+  .hero > * { position: relative; z-index: 1; }
+  .badge {
+    display: inline-block;
+    padding: 0.4rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    font-size: 0.75rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 2rem;
+  }
+  .hero h1 {
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    font-weight: 800;
+    line-height: 1.1;
+    margin-bottom: 1.5rem;
+    max-width: 800px;
+  }
+  .hero h1 .gradient {
+    background: linear-gradient(135deg, var(--accent), var(--orange), var(--purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .hero p {
+    font-size: 1.2rem;
+    color: var(--muted);
+    max-width: 600px;
+    margin-bottom: 2.5rem;
+  }
+  .hero-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.9rem 2rem;
+    background: var(--accent);
+    color: white;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: opacity 0.2s;
+  }
+  .hero-cta:hover { opacity: 0.85; }
+  .scroll-hint {
+    position: absolute;
+    bottom: 2rem;
+    color: var(--muted);
+    font-size: 0.8rem;
+    animation: bounce 2s ease infinite;
+  }
+  @keyframes bounce { 0%,100% { transform: translateY(0); } 50% { transform: translateY(6px); } }
+
+  /* SECTIONS */
+  section { padding: 5rem 2rem; max-width: 1100px; margin: 0 auto; }
+  section h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+  }
+  section .subtitle {
+    color: var(--muted);
+    font-size: 1rem;
+    margin-bottom: 2.5rem;
+  }
+
+  /* PROBLEM */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.8rem;
+  }
+  .stat-card .number {
+    font-size: 2.8rem;
+    font-weight: 800;
+    line-height: 1;
+    margin-bottom: 0.5rem;
+  }
+  .stat-card .number.red { color: var(--red); }
+  .stat-card .number.orange { color: var(--orange); }
+  .stat-card .label { color: var(--muted); font-size: 0.9rem; }
+  .root-cause {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--accent);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-top: 1.5rem;
+    color: var(--muted);
+    font-size: 0.95rem;
+  }
+  .root-cause strong { color: var(--text); }
+
+  /* GRIEF STAGES */
+  .stages {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  .stage {
+    display: grid;
+    grid-template-columns: 80px 1fr;
+    gap: 1.5rem;
+    align-items: start;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    transition: transform 0.15s;
+  }
+  .stage:hover { transform: translateX(4px); }
+  .stage-num {
+    font-size: 2.5rem;
+    font-weight: 800;
+    opacity: 0.15;
+    text-align: center;
+    line-height: 1;
+    padding-top: 0.2rem;
+  }
+  .stage-content h3 { font-size: 1.1rem; margin-bottom: 0.2rem; }
+  .stage-content .days { font-size: 0.75rem; color: var(--muted); margin-bottom: 0.5rem; }
+  .stage-content .tone { font-size: 0.8rem; color: var(--muted); margin-bottom: 0.6rem; }
+  .stage-content .example {
+    background: var(--surface2);
+    border-radius: 8px;
+    padding: 0.8rem 1rem;
+    font-size: 0.85rem;
+    line-height: 1.5;
+    font-style: italic;
+    border-left: 3px solid;
+  }
+  .s1 .stage-content h3 { color: var(--green); }
+  .s1 .example { border-color: var(--green); }
+  .s2 .stage-content h3 { color: var(--red); }
+  .s2 .example { border-color: var(--red); }
+  .s3 .stage-content h3 { color: var(--orange); }
+  .s3 .example { border-color: var(--orange); }
+  .s4 .stage-content h3 { color: var(--blue); }
+  .s4 .example { border-color: var(--blue); }
+  .s5 .stage-content h3 { color: var(--purple); }
+  .s5 .example { border-color: var(--purple); }
+
+  /* ARCHITECTURE */
+  .arch-diagram {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 2.5rem;
+    margin-bottom: 2rem;
+  }
+  .arch-flow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    flex-wrap: wrap;
+    margin-bottom: 2rem;
+  }
+  .arch-node {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1rem 1.4rem;
+    text-align: center;
+    min-width: 140px;
+  }
+  .arch-node .icon { font-size: 1.8rem; margin-bottom: 0.3rem; }
+  .arch-node .name { font-size: 0.8rem; font-weight: 600; }
+  .arch-node .desc { font-size: 0.7rem; color: var(--muted); }
+  .arch-node.highlight { border-color: var(--accent); box-shadow: 0 0 20px rgba(255,107,107,0.1); }
+  .arch-arrow {
+    font-size: 1.2rem;
+    color: var(--muted);
+    padding: 0 0.6rem;
+  }
+  .arch-label {
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+  }
+
+  /* DATA FLOW */
+  .flow-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    position: relative;
+    padding-left: 2rem;
+  }
+  .flow-steps::before {
+    content: '';
+    position: absolute;
+    left: 11px;
+    top: 12px;
+    bottom: 12px;
+    width: 2px;
+    background: var(--border);
+  }
+  .flow-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1rem 0;
+    position: relative;
+  }
+  .flow-dot {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 2px solid var(--accent);
+    background: var(--bg);
+    position: absolute;
+    left: -2rem;
+    top: 1.15rem;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: var(--accent);
+  }
+  .flow-step-content h4 { font-size: 0.9rem; margin-bottom: 0.2rem; }
+  .flow-step-content p { font-size: 0.8rem; color: var(--muted); }
+
+  /* RAG KNOWLEDGE */
+  .rag-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+  }
+  .rag-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    transition: transform 0.15s;
+  }
+  .rag-card:hover { transform: translateY(-2px); }
+  .rag-card .file-icon { font-size: 1.5rem; margin-bottom: 0.6rem; }
+  .rag-card h4 { font-size: 0.95rem; margin-bottom: 0.3rem; }
+  .rag-card .file-desc { font-size: 0.8rem; color: var(--muted); margin-bottom: 0.8rem; line-height: 1.4; }
+  .rag-card .tags { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+  .rag-card .tag {
+    font-size: 0.65rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+    background: var(--surface2);
+    color: var(--muted);
+    border: 1px solid var(--border);
+  }
+
+  /* VISION */
+  .vision-grid {
+    display: grid;
+    grid-template-columns: 1fr 60px 1fr;
+    gap: 1rem;
+    align-items: start;
+  }
+  .vision-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 2rem;
+  }
+  .vision-card h3 { font-size: 1.2rem; margin-bottom: 0.3rem; }
+  .vision-card .label-tag {
+    display: inline-block;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+  }
+  .vision-card.now .label-tag { background: rgba(46,204,113,0.15); color: var(--green); }
+  .vision-card.future .label-tag { background: rgba(155,89,182,0.15); color: var(--purple); }
+  .vision-card ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+  .vision-card li {
+    font-size: 0.85rem;
+    color: var(--muted);
+    padding-left: 1.4rem;
+    position: relative;
+  }
+  .vision-card li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 8px;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+  }
+  .vision-card.now li::before { background: var(--green); }
+  .vision-card.future li::before { background: var(--purple); }
+  .vision-arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    color: var(--muted);
+    padding-top: 4rem;
+  }
+
+  /* ROADMAP */
+  .roadmap {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-top: 2rem;
+  }
+  .roadmap-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    border-top: 3px solid;
+  }
+  .roadmap-item.phase1 { border-top-color: var(--green); }
+  .roadmap-item.phase2 { border-top-color: var(--orange); }
+  .roadmap-item.phase3 { border-top-color: var(--purple); }
+  .roadmap-item .phase {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 0.4rem;
+  }
+  .roadmap-item.phase1 .phase { color: var(--green); }
+  .roadmap-item.phase2 .phase { color: var(--orange); }
+  .roadmap-item.phase3 .phase { color: var(--purple); }
+  .roadmap-item h4 { font-size: 0.95rem; margin-bottom: 0.5rem; }
+  .roadmap-item ul { list-style: none; font-size: 0.8rem; color: var(--muted); }
+  .roadmap-item li { padding: 0.2rem 0; }
+  .roadmap-item li::before { content: '→ '; color: var(--border); }
+
+  /* TECH STACK */
+  .stack-row {
+    display: flex;
+    justify-content: center;
+    gap: 3rem;
+    margin: 2rem 0;
+  }
+  .stack-item {
+    text-align: center;
+  }
+  .stack-item .logo { font-size: 2.5rem; margin-bottom: 0.4rem; }
+  .stack-item .name { font-size: 0.9rem; font-weight: 600; }
+  .stack-item .role { font-size: 0.75rem; color: var(--muted); }
+
+  /* FOOTER */
+  footer {
+    text-align: center;
+    padding: 3rem 2rem;
+    color: var(--muted);
+    font-size: 0.8rem;
+    border-top: 1px solid var(--border);
+  }
+  footer a { color: var(--accent); text-decoration: none; }
+
+  @media (max-width: 768px) {
+    .stats-grid, .rag-grid, .roadmap, .vision-grid { grid-template-columns: 1fr; }
+    .arch-flow { flex-direction: column; }
+    .arch-arrow { transform: rotate(90deg); }
+    .vision-arrow { transform: rotate(90deg); padding: 1rem 0; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <span class="badge">Superchat &times; Needle Hackathon &mdash; Berlin 2026</span>
+  <h1>The follow-up agent that <span class="gradient">says the quiet part out loud</span></h1>
+  <p>SalesTherapist goes through the 5 Stages of Sales Grief when your leads ghost you. Every roast is backed by real data from your knowledge base.</p>
+  <a href="#" class="hero-cta workflow-link" style="opacity:0.5;pointer-events:none;">View Needle Workflow &mdash; link coming soon</a>
+  <div class="scroll-hint">&darr; scroll to explore</div>
+</div>
+
+<!-- PROBLEM -->
+<section>
+  <h2>The Problem</h2>
+  <p class="subtitle">Follow-ups are broken. Win-backs are ignored. Here's why.</p>
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="number red">7x</div>
+      <div class="label">more conversions when you reply within 5 minutes. Most teams take days.</div>
+    </div>
+    <div class="stat-card">
+      <div class="number red">60-70%</div>
+      <div class="label">of inbound leads end up unqualified. SDRs spend 2-5 hours per lead manually.</div>
+    </div>
+    <div class="stat-card">
+      <div class="number orange">5-7x</div>
+      <div class="label">more expensive to acquire a new customer vs. retaining an existing one.</div>
+    </div>
+    <div class="stat-card">
+      <div class="number orange">40%</div>
+      <div class="label">of rep time goes to admin, not selling. Follow-ups get forgotten.</div>
+    </div>
+  </div>
+  <div class="root-cause">
+    <strong>Root cause:</strong> Follow-up tools have no emotional awareness. They track <em>time</em> since last message, not the <em>quality</em> of the last message. They know WHEN someone went silent, but not WHY. So every lead gets the same boring "just checking in" — and ignores it.
+  </div>
+</section>
+
+<!-- SOLUTION: 5 STAGES -->
+<section>
+  <h2>The Solution: 5 Stages of Sales Grief</h2>
+  <p class="subtitle">An AI agent that reads emotions, remembers context, and says what every sales rep thinks but would never type.</p>
+  <div class="stages">
+    <div class="stage s1">
+      <div class="stage-num">1</div>
+      <div class="stage-content">
+        <h3>DENIAL</h3>
+        <div class="days">1-2 days silent &bull; RAG: product wins, news</div>
+        <div class="tone">Aggressively cheerful. Delusional optimism. Transparent excuses.</div>
+        <div class="example">"COMPLETELY unrelated to you not replying — we just shipped AI routing and I physically could not stop myself from messaging you. Your team is still copy-pasting between 5 WhatsApp groups right? Sorry, rhetorical question."</div>
+      </div>
+    </div>
+    <div class="stage s2">
+      <div class="stage-num">2</div>
+      <div class="stage-content">
+        <h3>ANGER</h3>
+        <div class="days">3-5 days silent &bull; RAG: competitor weaknesses, pain points</div>
+        <div class="tone">Brutally direct. Uncomfortable honesty. The friend who tells you about the spinach.</div>
+        <div class="example">"Sarah. SPREADSHEETS. In 2026. That's not a workflow, that's a cry for help. TechCorp switched to us and cut response time by 94%. But hey, spreadsheets are cool too."</div>
+      </div>
+    </div>
+    <div class="stage s3">
+      <div class="stage-num">3</div>
+      <div class="stage-content">
+        <h3>BARGAINING</h3>
+        <div class="days">6-10 days silent &bull; RAG: product changelog, new features</div>
+        <div class="tone">Shamelessly desperate. Holding a boombox outside your window.</div>
+        <div class="example">"I begged my manager for 30% off. I built a custom demo and named it 'Sarah's Team.' That's either dedicated or concerning. I have nothing left to offer except my dignity. That's been gone since day 5."</div>
+      </div>
+    </div>
+    <div class="stage s4">
+      <div class="stage-num">4</div>
+      <div class="stage-content">
+        <h3>DEPRESSION</h3>
+        <div class="days">11-20 days silent &bull; RAG: industry case studies, testimonials</div>
+        <div class="tone">Dramatically melancholic. Sad poet who happens to know your conversion metrics.</div>
+        <div class="example">"It's been 15 days. The team asks about you and I change the subject. I've started listening to Adele. By the way TechCorp went from 3-day response time to 4 hours. Not a guilt trip. Just information. That I'm sharing. While crying."</div>
+      </div>
+    </div>
+    <div class="stage s5">
+      <div class="stage-num">5</div>
+      <div class="stage-content">
+        <h3>ACCEPTANCE</h3>
+        <div class="days">21+ days silent &bull; RAG: competitive intel, FOMO triggers</div>
+        <div class="tone">Zen master with a knife. Total peace, then one devastating line.</div>
+        <div class="example">"I've made peace. No hard feelings. Quick FYI — RetailBrand, your competitor? Signed up Tuesday. They seem happy. I'll be over here. Helping your competitor. Wishing you and your spreadsheets all the best."</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ARCHITECTURE -->
+<section>
+  <h2>Architecture</h2>
+  <p class="subtitle">Three nodes. Two platforms. One unhinged personality.</p>
+  <div class="arch-diagram">
+    <div class="arch-flow">
+      <div class="arch-node">
+        <div class="icon">💬</div>
+        <div class="name">Superchat</div>
+        <div class="desc">WhatsApp / Telegram / Instagram / Email</div>
+      </div>
+      <div class="arch-arrow">&rarr;</div>
+      <div class="arch-node">
+        <div class="icon">⚡</div>
+        <div class="name">Webhook Trigger</div>
+        <div class="desc">Needle receives event</div>
+      </div>
+      <div class="arch-arrow">&rarr;</div>
+      <div class="arch-node highlight">
+        <div class="icon">🧠</div>
+        <div class="name">AI Agent</div>
+        <div class="desc">RAG search + grief stage + message</div>
+      </div>
+      <div class="arch-arrow">&rarr;</div>
+      <div class="arch-node">
+        <div class="icon">📡</div>
+        <div class="name">HTTP Request</div>
+        <div class="desc">Superchat send message API</div>
+      </div>
+      <div class="arch-arrow">&rarr;</div>
+      <div class="arch-node">
+        <div class="icon">📱</div>
+        <div class="name">Customer</div>
+        <div class="desc">Gets the bold message</div>
+      </div>
+    </div>
+    <div class="arch-label">Needle Workflow &mdash; all three nodes built in &lt;30 minutes using Needle's AI builder</div>
+  </div>
+</section>
+
+<!-- DATA FLOW -->
+<section>
+  <h2>Data Flow</h2>
+  <p class="subtitle">What happens in the ~22 seconds between trigger and Telegram delivery.</p>
+  <div class="flow-steps">
+    <div class="flow-step">
+      <div class="flow-dot">1</div>
+      <div class="flow-step-content">
+        <h4>Trigger received</h4>
+        <p>Webhook fires with contact name, days silent, conversation context, and conversation ID. In production this comes from Superchat's inbound message webhook; for the demo we trigger manually.</p>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-dot">2</div>
+      <div class="flow-step-content">
+        <h4>AI Agent activates</h4>
+        <p>Claude Sonnet 4.6 receives the input with the full SalesTherapist personality prompt. It reads the days_silent value to determine which grief stage to use.</p>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-dot">3</div>
+      <div class="flow-step-content">
+        <h4>RAG search (Needle Collection)</h4>
+        <p>The agent searches the knowledge base for: (a) grief playbook — personality guide and stage-specific tone rules, (b) product knowledge — features, case studies, competitor data, (c) conversation context — what the lead cared about.</p>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-dot">4</div>
+      <div class="flow-step-content">
+        <h4>Message generation</h4>
+        <p>Agent generates a 2-4 sentence WhatsApp-friendly message. Structured output: responseText + emotionalStage + reasoning. Every bold claim is grounded in RAG results — real data, not hallucination.</p>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-dot">5</div>
+      <div class="flow-step-content">
+        <h4>Superchat delivery</h4>
+        <p>HTTP Request node POSTs to Superchat's /messages API with the contact identifier and Telegram channel ID. Message arrives in the customer's Telegram within seconds.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- RAG KNOWLEDGE BASE -->
+<section>
+  <h2>RAG Knowledge Base</h2>
+  <p class="subtitle">Three markdown documents uploaded to a Needle Collection. The AI agent searches them before every message.</p>
+  <div class="rag-grid">
+    <div class="rag-card">
+      <div class="file-icon">🎭</div>
+      <h4>grief-playbook.md</h4>
+      <div class="file-desc">The personality engine. Defines the 5 grief stages, tone rules, banned phrases, and 3+ example messages per stage. This is what makes the bot bold instead of boring.</div>
+      <div class="tags">
+        <span class="tag">Personality</span>
+        <span class="tag">5 Stages</span>
+        <span class="tag">Tone Rules</span>
+        <span class="tag">Banned Phrases</span>
+        <span class="tag">Win-Back Templates</span>
+      </div>
+    </div>
+    <div class="rag-card">
+      <div class="file-icon">📊</div>
+      <h4>product-knowledge.md</h4>
+      <div class="file-desc">Product facts the agent weaponizes. Features, changelog, 4 case studies with real metrics, pricing, and competitor comparison. Every roast references real data from here.</div>
+      <div class="tags">
+        <span class="tag">Features</span>
+        <span class="tag">Changelog</span>
+        <span class="tag">Case Studies</span>
+        <span class="tag">Pricing</span>
+        <span class="tag">Competitors</span>
+      </div>
+    </div>
+    <div class="rag-card">
+      <div class="file-icon">💬</div>
+      <h4>demo-conversations.md</h4>
+      <div class="file-desc">Pre-seeded conversation scenarios. Sarah (the ghost), Marcus (the churned customer), Lisa (the hesitant evaluator). Each with full conversation history and emotional context.</div>
+      <div class="tags">
+        <span class="tag">Sarah / Ghost</span>
+        <span class="tag">Marcus / Churned</span>
+        <span class="tag">Lisa / Hesitant</span>
+        <span class="tag">Alex / Compliance</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- VISION: NOW vs FUTURE -->
+<section>
+  <h2>Vision</h2>
+  <p class="subtitle">What we built tonight vs. where this is going.</p>
+  <div class="vision-grid">
+    <div class="vision-card now">
+      <span class="label-tag">Hackathon MVP</span>
+      <h3>What it does today</h3>
+      <ul>
+        <li>Manual trigger with pre-seeded conversation context</li>
+        <li>3 static knowledge base documents (Needle Collection)</li>
+        <li>AI agent with personality prompt + RAG search</li>
+        <li>Single-channel delivery (Telegram via Superchat)</li>
+        <li>5 grief stages based on days_silent parameter</li>
+        <li>Structured output: message + stage + reasoning</li>
+        <li>Demo trigger page with one-click stage buttons</li>
+      </ul>
+    </div>
+    <div class="vision-arrow">&rarr;</div>
+    <div class="vision-card future">
+      <span class="label-tag">Production Vision</span>
+      <h3>Where this is going</h3>
+      <ul>
+        <li>Live Superchat webhook — auto-triggers on every inbound message</li>
+        <li>CRM connector — pulls real conversation history, not static context</li>
+        <li>Automatic days_silent calculation from Superchat timestamps</li>
+        <li>Multi-channel — WhatsApp, Instagram, Email, Telegram simultaneously</li>
+        <li>Tone calibration dial — adjust boldness from "professional" to "unhinged"</li>
+        <li>Sentiment analysis on inbound messages — detect frustration/excitement live</li>
+        <li>A/B testing grief stages — which stage converts best per segment</li>
+        <li>Analytics dashboard — track open rates, reply rates per grief stage</li>
+        <li>Team-wide deployment — each rep gets their own SalesTherapist tuned to their style</li>
+        <li>Self-learning RAG — auto-ingests new case studies, product updates, competitive intel</li>
+      </ul>
+    </div>
+  </div>
+  <div class="roadmap">
+    <div class="roadmap-item phase1">
+      <div class="phase">Phase 1 — Week 1-2</div>
+      <h4>Live Integration</h4>
+      <ul>
+        <li>Superchat webhook auto-trigger</li>
+        <li>Real conversation history fetch</li>
+        <li>Auto days_silent from timestamps</li>
+        <li>Multi-channel delivery</li>
+      </ul>
+    </div>
+    <div class="roadmap-item phase2">
+      <div class="phase">Phase 2 — Week 3-4</div>
+      <h4>Intelligence Layer</h4>
+      <ul>
+        <li>Live sentiment analysis</li>
+        <li>Tone calibration controls</li>
+        <li>CRM integration (HubSpot/Salesforce)</li>
+        <li>Auto-enrichment from web data</li>
+      </ul>
+    </div>
+    <div class="roadmap-item phase3">
+      <div class="phase">Phase 3 — Month 2+</div>
+      <h4>Scale & Learn</h4>
+      <ul>
+        <li>A/B testing per grief stage</li>
+        <li>Analytics & conversion tracking</li>
+        <li>Team-wide deployment</li>
+        <li>Self-learning knowledge base</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- TECH STACK -->
+<section>
+  <h2>Built With</h2>
+  <p class="subtitle">Two platforms, zero custom code.</p>
+  <div class="stack-row">
+    <div class="stack-item">
+      <div class="logo">🧵</div>
+      <div class="name">Needle</div>
+      <div class="role">AI Workflows + RAG Collections</div>
+    </div>
+    <div class="stack-item">
+      <div class="logo">💬</div>
+      <div class="name">Superchat</div>
+      <div class="role">Multi-Channel Messaging API</div>
+    </div>
+    <div class="stack-item">
+      <div class="logo">🤖</div>
+      <div class="name">Claude Sonnet 4.6</div>
+      <div class="role">AI Agent (via Needle)</div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  SalesTherapist &mdash; Built at <a href="https://luma.com/kbmq6si6?tk=MHr5aO">Superchat &times; Needle Builder's Night</a>, Berlin, April 2026.
+  <br>Every roast is backed by real data. No leads were harmed in the making of this demo.
+</footer>
+
+</body>
+</html>
